@@ -1,0 +1,2 @@
+local camera = {}
+camera.vitesse = 
