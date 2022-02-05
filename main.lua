@@ -17,42 +17,31 @@ width = love.graphics.getWidth()
 height = love.graphics.getHeight()
 
 
-local Niveau01 = require("Niveau/Niveau01/Niveau01")
+local Niveaux = require("Niveau/Niveaux")
+local personnage = require("personnage")
+local camera = require("Camera")
 
-local camera = 0
-
-personnage= {}
-personnage.x = width/2 - 100
-personnage.y = ((height/3)*2)-200
-personnage.scaleX = 2
-personnage.scaleY = 2
-personnage.LoadImg = function()
-  personnage.img = love.graphics.newImage("img/personnage.png")
-end
 
 
 function love.load()
-  Niveau01.Load()
   
-  personnage.LoadImg()
+  Niveaux.choixDuNiveau(1)
+  Niveaux.Load()
+  
+  personnage.Load()
   
 end
 
 function love.update(dt)
-  if love.keyboard.isDown("right") then
-    camera = camera + 5
-  end
   
-  if love.keyboard.isDown("left") then
-    camera = camera - 5
-  end
+  camera.deplacement()
   
 end
 
 function love.draw()
-  Niveau01.Draw(camera)
+  Niveaux.Draw(camera.position) --Affichage de la map 
   
-  love.graphics.draw(personnage.img, personnage.x,personnage.y,0,personnage.scaleX,personnage.scaleY)
+  personnage.Draw()
   
 end
 
