@@ -36,6 +36,9 @@ function love.update(dt)
   
   camera.deplacement()
   
+  personnage.update()
+  
+  
 end
 
 function love.draw()
