@@ -1,6 +1,9 @@
 local Niveau01 = {}
 Niveau01.longueurMap = nil
-local TilesMap = require("Niveau/Niveau01/TilesMap")
+local TilesMap = require("Niveau/Niveau01/TilesMap01")
+
+Niveau01.TilesMap = TilesMap
+
 function Niveau01.Load()
   
   TilesMap.Load()
@@ -9,9 +12,9 @@ function Niveau01.Load()
   
 end
 
-function Niveau01.Draw(pCamera)
+function Niveau01.Draw(pOriginX,pOriginY)
   
-  TilesMap.Draw(pCamera)
+  TilesMap.Draw(pOriginX,pOriginY)
   
 end
 

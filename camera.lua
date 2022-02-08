@@ -2,10 +2,15 @@ Niveaux = require("Niveau/Niveaux")
 --personnage = require("Personnage")
 
 local camera = {}
-camera.position = 0
 camera.vitesse = 5
 camera.bordureGauche = false
 camera.bordureDroit = false
+
+camera.collisionRight = false
+camera.collisionLeft = false
+camera.collisionBelow = false
+camera.collisionAbove = false
+
 camera.deplacement = function()
   
   
@@ -13,13 +18,13 @@ camera.deplacement = function()
   
   
   
-  if love.keyboard.isDown("right") and camera.bordureDroit == false and camera.bordureGauche == false then
-    camera.position = camera.position + camera.vitesse
+  if love.keyboard.isDown("right") and camera.bordureDroit == false and camera.bordureGauche == false and camera.collisionRight == false then
+    Niveaux.originX = Niveaux.originX + camera.vitesse
     
   end
   
-  if love.keyboard.isDown("left") and camera.bordureGauche == false and camera.bordureDroit == false then
-    camera.position = camera.position - camera.vitesse
+  if love.keyboard.isDown("left") and camera.bordureGauche == false and camera.bordureDroit == false and camera.collisionLeft == false then
+    Niveaux.originX = Niveaux.originX - camera.vitesse
   end
   
   camera.testBordure()
@@ -27,12 +32,12 @@ camera.deplacement = function()
 end
 
 camera.testBordure = function()
-  if camera.position < -100  then
+  if Niveaux.originX < 5  then
     camera.bordureGauche = true
   else
     camera.bordureGauche = false
   end
-if camera.position > Niveaux.longueurMap - 1500 then
+if Niveaux.originX > Niveaux.longueurMap - 1505 then
     camera.bordureDroit = true
   else
     camera.bordureDroit = false

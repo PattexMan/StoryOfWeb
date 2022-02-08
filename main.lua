@@ -37,12 +37,16 @@ function love.update(dt)
   camera.deplacement()
   
   personnage.update()
+  --print(Niveaux.originX)
+  --print(Niveaux.originY)
+  --print(personnage.posC)
+  --print(personnage.posL)
   
   
 end
 
 function love.draw()
-  Niveaux.Draw(camera.position) --Affichage de la map 
+  Niveaux.Draw(Niveaux.originX,Niveaux.originY) --Affichage de la map 
   
   personnage.Draw()
   
