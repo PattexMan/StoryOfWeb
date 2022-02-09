@@ -1,4 +1,4 @@
-camera = require("Camera")
+
 Niveaux = require("Niveau/Niveaux")
 
 local personnage = {}
@@ -14,11 +14,15 @@ personnage.oy = personnage.TAILLE_PIXEL_Y/2
 personnage.lock = true
 personnage.posC = nil
 personnage.posL = nil
+personnage.bordureGauche = false
+personnage.bordureDroit = false
 
 personnage.collisionRight = false
 personnage.collisionLeft = false
 personnage.collisionBelow = false
 personnage.collisionAbove = false
+
+i = 1 --Grid actuel
 
 personnage.Load = function()
   personnage.img = love.graphics.newImage("img/personnage.png")
@@ -30,9 +34,10 @@ personnage.update = function()
   
   personnage.Deplacement()
   
-  PositionActuel()
+  getTileMapActuel()
   
   CollideUpdate()
+  
   
   
 end
@@ -43,7 +48,22 @@ personnage.Draw = function()
   love.graphics.draw(personnage.img,personnage.x,personnage.y,0,personnage.scaleX,personnage.scaleY,personnage.ox,personnage.oy)
 end
 
-function personnage.Deplacement()
+
+
+
+
+function personnage.Deplacement() ------ICI-------
+  
+  if love.keyboard.isDown("right") and personnage.bordureDroit == false and personnage.bordureGauche == false and personnage.collisionRight == false then
+    Niveaux.originX = Niveaux.originX + personnage.vitesse
+    
+  end
+  
+  if love.keyboard.isDown("left") and personnage.bordureGauche == false and personnage.bordureDroit == false and personnage.collisionLeft == false then
+    Niveaux.originX = Niveaux.originX - personnage.vitesse
+  end
+  
+  personnage.testBordure()
   
   bordureGauche()
   
@@ -51,8 +71,22 @@ function personnage.Deplacement()
   
 end
 
+personnage.testBordure = function()
+  if Niveaux.originX < 5  then
+    personnage.bordureGauche = true
+  else
+    personnage.bordureGauche = false
+  end
+if Niveaux.originX > Niveaux.longueurMap - 1505 then
+    personnage.bordureDroit = true
+  else
+    personnage.bordureDroit = false
+  end
+end
+
+
 function bordureGauche()
-  if camera.bordureGauche == true then
+  if personnage.bordureGauche == true then
     personnage.lock = false
   else
     personnage.lock = true
@@ -70,7 +104,7 @@ personnage.collisionLeft == false then
     if personnage.x < width/2 - personnage.TAILLE_PIXEL_X/2 then
       personnage.x = personnage.x + personnage.vitesse
     else
-      camera.bordureGauche = false
+      personnage.bordureGauche = false
     end
     
     
@@ -78,7 +112,7 @@ personnage.collisionLeft == false then
 end
 
 function bordureDroit()
-  if camera.bordureDroit == true then
+  if personnage.bordureDroit == true then
     personnage.lock = false
   else
     personnage.lock = true
@@ -97,7 +131,7 @@ function bordureDroit()
     if personnage.x > width/2 - personnage.TAILLE_PIXEL_X/2 then
       personnage.x = personnage.x - personnage.vitesse
     else
-      camera.bordureDroit = false
+      personnage.bordureDroit = false
     end
     
     
@@ -112,38 +146,33 @@ function PositionActuel()
   personnage.posC = math.floor((personnage.x + Niveaux.originX) / 100) + 1
   personnage.posL = math.floor((personnage.y + Niveaux.originY) / 100) + 1
   
+  
+  
+  
 end
 
-function getTileAt(pX, pY, pOX, pOY )
-  
+function getTileAt(pX, pY, pOX, pOY , g)
   local col = math.floor((pX + pOX) / 100) + 1
   local lig = math.floor((pY + pOY) / 100) + 1
+  local grid = g
   
-  if col>0 and col<=#Niveaux.actif.TilesMap.Map.Grid[1] and lig>0 and lig<=#Niveaux.actif.TilesMap.Map.Grid then --Niveaux.actif.TilesMap.Map.Grid c'est la grille du niveau actif
-    local id = Niveaux.actif.TilesMap.Map.Grid[lig][col]
-    return id
-  end
-  
-  return 0
+  local id = Niveaux.actif.TilesMap.Map.Grid[grid][lig][col]
+  return id
 end
 
 function CollideUpdate()
   
   if CollideRight() == true then
-    camera.collisionRight = true
     personnage.collisionRight = true
     
   else
-    camera.collisionRight = false
     personnage.collisionRight = false
   end
   
   if CollideLeft() == true then
-    camera.collisionLeft = true
     personnage.collisionLeft = true
     
   else
-    camera.collisionLeft = false
     personnage.collisionLeft = false
   end
   
@@ -152,30 +181,92 @@ function CollideUpdate()
   
 end
 
+function getTileMapActuel()
+  
+  i = Niveaux.actif.TilesMap.Map.Grid_ACTUEL
+  
+end
 
 function CollideRight()
-  local id1 = getTileAt(personnage.x + 51, personnage.y - 48, Niveaux.originX, Niveaux.originY)
-  local id2 = getTileAt(personnage.x + 51, personnage.y + 48, Niveaux.originX, Niveaux.originY)
+  local id1 = getTileAt(personnage.x + 51, personnage.y - 48, Niveaux.actif.TilesMap.Map.Grid_originX_ACTUEL[i], Niveaux.actif.TilesMap.Map.Grid_originY_ACTUEL[i],i)
+  local id2 = getTileAt(personnage.x + 51, personnage.y + 48, Niveaux.actif.TilesMap.Map.Grid_originX_ACTUEL[i], Niveaux.actif.TilesMap.Map.Grid_originY_ACTUEL[i],i)
   return Niveaux.actif.TilesMap.isSolid(id1) or Niveaux.actif.TilesMap.isSolid(id2)
 end
 
 function CollideLeft()
-  local id1 = getTileAt(personnage.x - 51, personnage.y - 48, Niveaux.originX, Niveaux.originY)
-  local id2 = getTileAt(personnage.x - 51, personnage.y + 48, Niveaux.originX, Niveaux.originY)
+  local id1 = getTileAt(personnage.x - 51, personnage.y - 48, Niveaux.actif.TilesMap.Map.Grid_originX_ACTUEL[i], Niveaux.actif.TilesMap.Map.Grid_originY_ACTUEL[i],i)
+  local id2 = getTileAt(personnage.x - 51, personnage.y + 48, Niveaux.actif.TilesMap.Map.Grid_originX_ACTUEL[i], Niveaux.actif.TilesMap.Map.Grid_originY_ACTUEL[i],i)
+  return Niveaux.actif.TilesMap.isSolid(id1) or Niveaux.actif.TilesMap.isSolid(id2)
+end
+
+function CollideBelow()
+  local id1 = getTileAt(personnage.x - 48, personnage.y + 51, Niveaux.actif.TilesMap.Map.Grid_originX_ACTUEL[i], Niveaux.actif.TilesMap.Map.Grid_originY_ACTUEL[i],i)
+  local id2 = getTileAt(personnage.x + 48, personnage.y + 51, Niveaux.actif.TilesMap.Map.Grid_originX_ACTUEL[i], Niveaux.actif.TilesMap.Map.Grid_originY_ACTUEL[i],i)
+  return Niveaux.actif.TilesMap.isSolid(id1) or Niveaux.actif.TilesMap.isSolid(id2)
+end
+
+function CollideAbove()
+  local id1 = getTileAt(personnage.x - 48, personnage.y - 51, Niveaux.actif.TilesMap.Map.Grid_originX_ACTUEL[i], Niveaux.actif.TilesMap.Map.Grid_originY_ACTUEL[i],i)
+  local id2 = getTileAt(personnage.x + 48, personnage.y - 51, Niveaux.actif.TilesMap.Map.Grid_originX_ACTUEL[i], Niveaux.actif.TilesMap.Map.Grid_originY_ACTUEL[i],i)
+  return Niveaux.actif.TilesMap.isSolid(id1) or Niveaux.actif.TilesMap.isSolid(id2) 
+end
+
+
+--[[
+function CollideRight()
+  local id1 = getTileAt(personnage.x + 51, personnage.y - 48, Niveaux.actif.TilesMap.Map.Grid_originX_ACTUEL[Niveaux.actif.TilesMap.Grid_ACTUEL], Niveaux.actif.TilesMap.Map.Grid_originY_ACTUEL[Niveaux.actif.TilesMap.Grid_ACTUEL])
+  local id2 = getTileAt(personnage.x + 51, personnage.y + 48, Niveaux.actif.TilesMap.Map.Grid_originX_ACTUEL[Niveaux.actif.TilesMap.Grid_ACTUEL], Niveaux.actif.TilesMap.Map.Grid_originY_ACTUEL[Niveaux.actif.TilesMap.Grid_ACTUEL])
+  return Niveaux.actif.TilesMap.isSolid(id1) or Niveaux.actif.TilesMap.isSolid(id2)
+end
+
+function CollideLeft()
+  local id1 = getTileAt(personnage.x - 51, personnage.y - 48, Niveaux.actif.TilesMap.Map.Grid_originX_ACTUEL[Niveaux.actif.TilesMap.Grid_ACTUEL], Niveaux.actif.TilesMap.Map.Grid_originY_ACTUEL[Niveaux.actif.TilesMap.Grid_ACTUEL])
+  local id2 = getTileAt(personnage.x - 51, personnage.y + 48, Niveaux.actif.TilesMap.Map.Grid_originX_ACTUEL[Niveaux.actif.TilesMap.Grid_ACTUEL], Niveaux.actif.TilesMap.Map.Grid_originY_ACTUEL[Niveaux.actif.TilesMap.Grid_ACTUEL])
   return Niveaux.actif.TilesMap.isSolid(id1) or Niveaux.actif.TilesMap.isSolid(id2)
 end
 
 function CollideBelow()
 
-  local id1 = getTileAt(personnage.x - 48, personnage.y + 51, Niveaux.originX, Niveaux.originY)
-  local id2 = getTileAt(personnage.x + 48, personnage.y + 51, Niveaux.originX, Niveaux.originY)
+  local id1 = getTileAt(personnage.x - 48, personnage.y + 51, Niveaux.actif.TilesMap.Map.Grid_originX_ACTUEL[Niveaux.actif.TilesMap.Grid_ACTUEL], Niveaux.actif.TilesMap.Map.Grid_originY_ACTUEL[Niveaux.actif.TilesMap.Grid_ACTUEL])
+  local id2 = getTileAt(personnage.x + 48, personnage.y + 51, Niveaux.actif.TilesMap.Map.Grid_originX_ACTUEL[Niveaux.actif.TilesMap.Grid_ACTUEL], Niveaux.actif.TilesMap.Map.Grid_originY_ACTUEL[Niveaux.actif.TilesMap.Grid_ACTUEL])
   return Niveaux.actif.TilesMap.isSolid(id1) or Niveaux.actif.TilesMap.isSolid(id2)
 end
 
 function CollideAbove()
-  local id1 = getTileAt(personnage.x - 48, personnage.y - 51, Niveaux.originX, Niveaux.originY)
-  local id2 = getTileAt(personnage.x + 48, personnage.y - 51, Niveaux.originX, Niveaux.originY)
+  local id1 = getTileAt(personnage.x - 48, personnage.y - 51, Niveaux.actif.TilesMap.Map.Grid_originX_ACTUEL[Niveaux.actif.TilesMap.Grid_ACTUEL], Niveaux.actif.TilesMap.Map.Grid_originY_ACTUEL[Niveaux.actif.TilesMap.Grid_ACTUEL])
+  local id2 = getTileAt(personnage.x + 48, personnage.y - 51, Niveaux.actif.TilesMap.Map.Grid_originX_ACTUEL[Niveaux.actif.TilesMap.Grid_ACTUEL], Niveaux.actif.TilesMap.Map.Grid_originY_ACTUEL[Niveaux.actif.TilesMap.Grid_ACTUEL])
   return Niveaux.actif.TilesMap.isSolid(id1) or Niveaux.actif.TilesMap.isSolid(id2) 
 end
 
+
+
+]]--
+
+
+--[[
+function CollideRight()
+  local id1 = getTileAt(personnage.x + 51, personnage.y - 48, Niveaux.actif.TilesMap.Map.Grid_originX_ACTUEL[1], Niveaux.actif.TilesMap.Map.Grid_originY_ACTUEL[1])
+  local id2 = getTileAt(personnage.x + 51, personnage.y + 48, Niveaux.actif.TilesMap.Map.Grid_originX_ACTUEL[1], Niveaux.actif.TilesMap.Map.Grid_originY_ACTUEL[1])
+  return Niveaux.actif.TilesMap.isSolid(id1) or Niveaux.actif.TilesMap.isSolid(id2)
+end
+
+function CollideLeft()
+  local id1 = getTileAt(personnage.x - 51, personnage.y - 48, Niveaux.actif.TilesMap.Map.Grid_originX_ACTUEL[1], Niveaux.actif.TilesMap.Map.Grid_originY_ACTUEL[1])
+  local id2 = getTileAt(personnage.x - 51, personnage.y + 48, Niveaux.actif.TilesMap.Map.Grid_originX_ACTUEL[1], Niveaux.actif.TilesMap.Map.Grid_originY_ACTUEL[1])
+  return Niveaux.actif.TilesMap.isSolid(id1) or Niveaux.actif.TilesMap.isSolid(id2)
+end
+
+function CollideBelow()
+
+  local id1 = getTileAt(personnage.x - 48, personnage.y + 51, Niveaux.actif.TilesMap.Map.Grid_originX_ACTUEL[1], Niveaux.actif.TilesMap.Map.Grid_originY_ACTUEL[1])
+  local id2 = getTileAt(personnage.x + 48, personnage.y + 51, Niveaux.actif.TilesMap.Map.Grid_originX_ACTUEL[1], Niveaux.actif.TilesMap.Map.Grid_originY_ACTUEL[1])
+  return Niveaux.actif.TilesMap.isSolid(id1) or Niveaux.actif.TilesMap.isSolid(id2)
+end
+
+function CollideAbove()
+  local id1 = getTileAt(personnage.x - 48, personnage.y - 51, Niveaux.actif.TilesMap.Map.Grid_originX_ACTUEL[1], Niveaux.actif.TilesMap.Map.Grid_originY_ACTUEL[1])
+  local id2 = getTileAt(personnage.x + 48, personnage.y - 51, Niveaux.actif.TilesMap.Map.Grid_originX_ACTUEL[1], Niveaux.actif.TilesMap.Map.Grid_originY_ACTUEL[1])
+  return Niveaux.actif.TilesMap.isSolid(id1) or Niveaux.actif.TilesMap.isSolid(id2) 
+end
+]]--
 return personnage

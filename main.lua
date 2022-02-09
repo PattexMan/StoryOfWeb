@@ -17,39 +17,22 @@ width = love.graphics.getWidth()
 height = love.graphics.getHeight()
 
 
-local Niveaux = require("Niveau/Niveaux")
-local personnage = require("personnage")
-local camera = require("Camera")
+local game = require("game")
 
 
 
 function love.load()
-  
-  Niveaux.choixDuNiveau(1)
-  Niveaux.Load()
-  
-  personnage.Load()
-  
+  game.load()
 end
 
 function love.update(dt)
   
-  camera.deplacement()
-  
-  personnage.update()
-  --print(Niveaux.originX)
-  --print(Niveaux.originY)
-  --print(personnage.posC)
-  --print(personnage.posL)
-  
+  game.update(dt)
   
 end
 
 function love.draw()
-  Niveaux.Draw(Niveaux.originX,Niveaux.originY) --Affichage de la map 
-  
-  personnage.Draw()
-  
+  game.draw()
 end
 
 function love.keypressed(key)

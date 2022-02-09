@@ -12,9 +12,13 @@ function Niveau01.Load()
   
 end
 
-function Niveau01.Draw(pOriginX,pOriginY)
+function Niveau01.Update(pX,pY)
+  TilesMap.Update(pX,pY)
+end
+
+function Niveau01.Draw()
   
-  TilesMap.Draw(pOriginX,pOriginY)
+  TilesMap.Draw()
   
 end
 

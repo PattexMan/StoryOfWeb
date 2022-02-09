@@ -7,12 +7,6 @@ Niveaux.longueurMap = nil
 Niveaux.originX = 0
 Niveaux.originY = 0
 
-function Niveaux.choixDuNiveau(pNiveau)
-  if pNiveau == 1 then
-    Niveaux.actif = Niveau01
-  end
-end
-
 function Niveaux.Load()
   
   Niveaux.actif.Load()
@@ -20,9 +14,14 @@ function Niveaux.Load()
   
 end
 
-function Niveaux.Draw(pOriginX,pOriginY)
+function Niveaux.Update(pX,pY)
+  Niveaux.actif.Update(pX,pY)
+end
+
+
+function Niveaux.Draw()
   
-  Niveaux.actif.Draw(pOriginX,pOriginY)
+  Niveaux.actif.Draw()
   
 end
 
