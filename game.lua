@@ -1,35 +1,28 @@
 local game = {}
 
-
+local niveaux = require("Niveau/Niveaux")
 local personnage = require("personnage")
-local map = require("map")
 
-function game.load()
+game.Load = function()
   
-  map.load()
-  
-  
+  niveaux.choixDuNiveau(1)
+  niveaux.Load()
   
   personnage.Load()
   
 end
 
-function game.update(dt)
+game.Update = function(dt)
   
-  map.update()
-  
-  Niveaux.Update(Niveaux.originX,Niveaux.originY)
-  
-  personnage.update() --update les fonctions : personnage.Deplacement() PositionActuel() CollideUpdate()
-  
+  personnage.Update(dt)
   
 end
 
-function game.draw()
+game.Draw = function()
   
-  map.draw()
+  niveaux.Draw() --Affichage de la map 
   
-  personnage.Draw() --Dessine le personnage
+  personnage.Draw()
   
 end
 

@@ -1,26 +1,18 @@
 local Niveau01 = {}
 Niveau01.longueurMap = nil
-local TilesMap = require("Niveau/Niveau01/TilesMap01")
-
-Niveau01.TilesMap = TilesMap
-
+Niveau01.TilesMap = require("Niveau/Niveau01/TilesMap")
 function Niveau01.Load()
   
-  TilesMap.Load()
+  Niveau01.TilesMap.Load()
   
-  Niveau01.longueurMap = TilesMap.MAP_PIXEL_WITDH
+  Niveau01.longueurMap = Niveau01.TilesMap.MAP_PIXEL_WITDH
   
-end
-
-function Niveau01.Update(pX,pY)
-  TilesMap.Update(pX,pY)
 end
 
 function Niveau01.Draw()
   
-  TilesMap.Draw()
+  Niveau01.TilesMap.Draw()
   
 end
-
 
 return Niveau01

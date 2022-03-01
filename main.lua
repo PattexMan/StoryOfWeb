@@ -17,22 +17,25 @@ width = love.graphics.getWidth()
 height = love.graphics.getHeight()
 
 
+
 local game = require("game")
 
-
-
 function love.load()
-  game.load()
+  
+  game.Load()
+  
 end
 
 function love.update(dt)
   
-  game.update(dt)
+  game.Update(dt)
   
 end
 
 function love.draw()
-  game.draw()
+  
+  game.Draw()
+  
 end
 
 function love.keypressed(key)
